@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="email"] {
+            width: 300px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 5px 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #data-list {
+            margin-top: 20px;
+        }
+        .data-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Expense Tracker</h1>
+    <form id="data-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        
+        <button type="submit">Add Data</button>
+    </form>
+    
+    <button id="fetch-data-btn">Fetch Data</button>
+    <div id="data-list"></div>
+    
+    <script>
+        document.getElementById('data-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            
+            const response = await fetch('/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, email })
+            });
+            
+            if (response.ok) {
+                alert('Data added successfully');
+                document.getElementById('data-form').reset();
+            } else {
+                alert('Error adding data');
+            }
+        });
+        
+        document.getElementById('fetch-data-btn').addEventListener('click', async function () {
+            const response = await fetch('/fetch-data');
+            
+            if (response.ok) {
+                const data = await response.json();
+                const dataList = document.getElementById('data-list');
+                dataList.innerHTML = '';
+                
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.classList.add('data-item');
+                    div.textContent = `Name: ${item.name}, Email: ${item.email}`;
+                    dataList.appendChild(div);
+                });
+            } else {
+                alert('Error fetching data');
+            }
+        });
+    </script>
+</body>
+</html>
